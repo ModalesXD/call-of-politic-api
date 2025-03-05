@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -15,9 +9,18 @@ datasource db {
 
 model Player {
   id        String   @id @default(cuid())
-  name      String
+  name      String   @unique
+  countryId Int
+  ideology  String
+  image     String
+  rankId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  country   Country  @relation(fields: [countryId], references: [id])
+  rank      Rank     @relation(fields: [rankId], references: [id])
+
+  @@index([name])  // Añadir índice en 'name' para búsquedas más rápidas
 }
 
 model Anunce {
@@ -25,7 +28,140 @@ model Anunce {
   title       String
   description String
   content     String
-  countrieId  Int
-  category    String
+  countryId   Int
+  categoryId  Int
   image       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  country     Country @relation(fields: [countryId], references: [id])
+  category    Category @relation(fields: [categoryId], references: [id])
+
+  @@index([title])  // Añadir índice en 'title' para búsquedas
+}
+
+model Npc {
+  id        Int     @id @default(autoincrement())
+  name      String
+  countryId Int
+  ideologyId Int
+  image     String
+  rankId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  country   Country  @relation(fields: [countryId], references: [id])
+  rank      Rank     @relation(fields: [rankId], references: [id])
+
+  @@index([name])  // Añadir índice en 'name' para búsquedas
+}
+
+model Rank {
+  id         Int    @id @default(autoincrement())
+  name       String @unique
+  image      String
+  permission String
+
+  players    Player[]
+  npcs       Npc[]
+
+  @@index([name])  // Índice para búsquedas por nombre
+}
+
+model Country {
+  id        Int     @id @default(autoincrement())
+  name      String  @unique
+  image     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  players   Player[]
+  npcs      Npc[]
+  anuncios  Anunce[]
+  cities    City[]
+  states    State[]
+  events    Event[]
+  statistics Estadistic[]
+
+  @@index([name])  // Añadir índice para búsquedas de países por nombre
+}
+
+model Category {
+  id        Int     @id @default(autoincrement())
+  name      String  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  events    Event[]
+  statistics Estadistic[]
+  anuncios  Anunce[]
+
+  @@index([name])  // Índice para búsquedas de categorías
+}
+
+model Ideology {
+  id        Int     @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])  // Índice en 'name' para búsquedas
+}
+
+model City {
+  id        Int     @id @default(autoincrement())
+  name      String
+  countryId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  country   Country  @relation(fields: [countryId], references: [id])
+
+  @@index([name])  // Índice para búsquedas de ciudades por nombre
+}
+
+model State {
+  id        Int     @id @default(autoincrement())
+  name      String
+  countryId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  country   Country  @relation(fields: [countryId], references: [id])
+
+  @@index([name])  // Índice para búsquedas de estados por nombre
+}
+
+model Event {
+  id        Int     @id @default(autoincrement())
+  name      String
+  description String
+  content   String
+  countryId Int
+  categoryId Int
+  image     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  country   Country  @relation(fields: [countryId], references: [id])
+  category  Category @relation(fields: [categoryId], references: [id])
+
+  @@index([name])  // Índice para búsquedas de eventos por nombre
+}
+
+model Estadistic {
+  id        Int     @id @default(autoincrement())
+  name      String
+  description String
+  content   String
+  countryId Int
+  categoryId Int
+  image     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  country   Country  @relation(fields: [countryId], references: [id])
+  category  Category @relation(fields: [categoryId], references: [id])
+
+  @@index([name])  // Índice para búsquedas de estadísticas por nombre
 }
