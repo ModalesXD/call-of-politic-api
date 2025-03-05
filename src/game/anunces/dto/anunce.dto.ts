@@ -1,17 +1,37 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
+import { IsString, IsNumber, IsUrl, IsNotEmpty, IsOptional } from "class-validator";
 
+export class AnunceDto {
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+
+  @IsString()
+  @IsNotEmpty()
+  description: string;
+
+  countryId: string;
+  categoryId: string;
+  @IsString()
+  @IsNotEmpty()
+  content: string;
+
+  @IsString()
+  @IsUrl()
+  @IsNotEmpty()
+  image: string;
+}
 
 export class GetAnunceDto {
-    @IsNumber()
-    @IsNotEmpty()
-    id: number;
-  
-    @IsNumber()
-    @IsNotEmpty()
-    countryId?: number;
-  }
-  
-  export class CreateAnunceDto {
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+}
+
+export class CreateAnunceDto  {
     @IsString()
     @IsNotEmpty()
     title: string;
@@ -19,21 +39,17 @@ export class GetAnunceDto {
     @IsString()
     @IsNotEmpty()
     description: string;
-  
+    @IsString()  
+    countryId: string;
+    @IsString()
+    categoryId: string;
+    
     @IsString()
     @IsNotEmpty()
     content: string;
   
-    @IsNumber()
-    @IsNotEmpty()
-    countryId: number;
-  
     @IsString()
-    @IsNotEmpty()
-    categoryId: number;
-  
-    @IsString()
-    @IsOptional()
     @IsUrl()
+    @IsNotEmpty()
     image: string;
-  }
+}

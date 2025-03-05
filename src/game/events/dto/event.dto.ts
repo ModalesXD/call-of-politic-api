@@ -13,10 +13,10 @@ export class CreateEventDto {
     content: string;
 
     @IsNumber()
-    countryId: number;
+    countryId: string;
 
     @IsNumber()
-    categoryId: number;
+    categoryId: string;
 
     @IsString()
     @IsUrl()
@@ -25,7 +25,7 @@ export class CreateEventDto {
 
 export class GetEventDto {
     @IsNumber()
-    id: number;
+    id: string;
 }
 
 export class UpdateEventDto {
@@ -39,10 +39,10 @@ export class UpdateEventDto {
     content: string;
 
     @IsNumber()
-    countryId: number;
+    countryId: string;
 
     @IsNumber()
-    categoryId: number;
+    categoryId: string;
 
     @IsString()
     @IsUrl()
@@ -51,6 +51,6 @@ export class UpdateEventDto {
 
 export class DeleteEventDto {
     @IsNumber()
-    id: number;
+    id: string;
 }
 

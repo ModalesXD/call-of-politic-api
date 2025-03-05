@@ -1,12 +1,12 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { GetEventDto, UpdateEventDto, CreateEventDto } from './dto/event.dto';
+import { GetEventDto, UpdateEventDto, CreateEventDto} from './dto/event.dto';
 
 @Injectable()
 export class EventsService {
   constructor(private prisma: PrismaService) {}
 
-  async getRandomEvent(countryId?: number, categoryId?: number): Promise<GetEventDto> {
+  async getRandomEvent(countryId?: string, categoryId?: string): Promise<GetEventDto> {
     try {
       const event = await this.prisma.event.findFirst({
         where: {
@@ -28,8 +28,8 @@ export class EventsService {
 
   async getEvents(
     count?: number,
-    categoryId?: number,
-    countryId?: number
+    categoryId?: string,
+    countryId?: string
   ): Promise<GetEventDto[]> {
     return this.prisma.event.findMany({
       where: {
@@ -40,7 +40,7 @@ export class EventsService {
     });
   }
 
-  async getEventById(id: number): Promise<GetEventDto | null> {
+  async getEventById(id: string): Promise<GetEventDto | null> {
     return this.prisma.event.findUnique({ where: { id } });
   }
 
@@ -52,11 +52,11 @@ export class EventsService {
     );
   }
 
-  async deleteEvent(id: number): Promise<GetEventDto> {
+  async deleteEvent(id: string): Promise<GetEventDto> {
     return this.prisma.event.delete({ where: { id } });
   }
 
-  async updateEvent(id: number, data: UpdateEventDto): Promise<GetEventDto> {
+  async updateEvent(id: string, data: UpdateEventDto): Promise<GetEventDto> {
     return this.prisma.event.update({ where: { id }, data });
   }
 }

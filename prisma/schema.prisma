@@ -10,158 +10,214 @@ datasource db {
 model Player {
   id        String   @id @default(cuid())
   name      String   @unique
-  countryId Int
-  ideology  String
+  countryId String
+  ideologyId String
   image     String
-  rankId    Int
+  rankId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   country   Country  @relation(fields: [countryId], references: [id])
   rank      Rank     @relation(fields: [rankId], references: [id])
+  ideology  Ideology @relation(fields: [ideologyId], references: [id])
+  votes     Vote[]   @relation("PlayerVotes")
+  voterVotes Vote[]  @relation("VoterPlayerVotes")
+  elections PlayerElections[]
 
-  @@index([name])  // Añadir índice en 'name' para búsquedas más rápidas
+  @@index([name])
 }
 
-model Anunce {
-  id          Int     @id @default(autoincrement())
+model Announcement {
+  id          String   @id @default(cuid())
   title       String
   description String
   content     String
-  countryId   Int
-  categoryId  Int
+  countryId   String
+  categoryId  String
   image       String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  country     Country @relation(fields: [countryId], references: [id])
+  country     Country  @relation(fields: [countryId], references: [id])
   category    Category @relation(fields: [categoryId], references: [id])
 
-  @@index([title])  // Añadir índice en 'title' para búsquedas
+  @@index([title])
 }
 
 model Npc {
-  id        Int     @id @default(autoincrement())
-  name      String
-  countryId Int
-  ideologyId Int
-  image     String
-  rankId    Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  countryId     String
+  ideologyId    String
+  image         String
+  rankId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  country   Country  @relation(fields: [countryId], references: [id])
-  rank      Rank     @relation(fields: [rankId], references: [id])
+  country       Country  @relation(fields: [countryId], references: [id])
+  rank          Rank     @relation(fields: [rankId], references: [id])
+  ideology      Ideology @relation(fields: [ideologyId], references: [id])
+  votes         Vote[]   @relation("NpcVotes")
+  voterVotes    Vote[]   @relation("VoterNpcVotes")
+  playerElections PlayerElections[]
 
-  @@index([name])  // Añadir índice en 'name' para búsquedas
+  @@index([name])
 }
 
 model Rank {
-  id         Int    @id @default(autoincrement())
-  name       String @unique
+  id         String  @id @default(cuid())
+  name       String  @unique
   image      String
   permission String
 
   players    Player[]
   npcs       Npc[]
 
-  @@index([name])  // Índice para búsquedas por nombre
+  @@index([name])
 }
 
 model Country {
-  id        Int     @id @default(autoincrement())
-  name      String  @unique
-  image     String
+  id            String   @id @default(cuid())
+  name          String   @unique
+  image         String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  players       Player[]
+  npcs          Npc[]
+  announcements Announcement[]
+  cities        City[]
+  states        State[]
+  events        Event[]
+  statistics    Statistic[]
+  elections     Elections[]
+
+  @@index([name])
+}
+
+model Category {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  events        Event[]
+  statistics    Statistic[]
+  announcements Announcement[]
+
+  @@index([name])
+}
+
+model Ideology {
+  id        String   @id @default(cuid())
+  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   players   Player[]
   npcs      Npc[]
-  anuncios  Anunce[]
-  cities    City[]
-  states    State[]
-  events    Event[]
-  statistics Estadistic[]
-
-  @@index([name])  // Añadir índice para búsquedas de países por nombre
-}
-
-model Category {
-  id        Int     @id @default(autoincrement())
-  name      String  @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  events    Event[]
-  statistics Estadistic[]
-  anuncios  Anunce[]
-
-  @@index([name])  // Índice para búsquedas de categorías
-}
-
-model Ideology {
-  id        Int     @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([name])  // Índice en 'name' para búsquedas
+  
+  @@index([name])
 }
 
 model City {
-  id        Int     @id @default(autoincrement())
+  id        String   @id @default(cuid())
   name      String
-  countryId Int
+  countryId String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   country   Country  @relation(fields: [countryId], references: [id])
 
-  @@index([name])  // Índice para búsquedas de ciudades por nombre
+  @@index([name])
 }
 
 model State {
-  id        Int     @id @default(autoincrement())
+  id        String   @id @default(cuid())
   name      String
-  countryId Int
+  countryId String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   country   Country  @relation(fields: [countryId], references: [id])
 
-  @@index([name])  // Índice para búsquedas de estados por nombre
+  @@index([name])
 }
 
 model Event {
-  id        Int     @id @default(autoincrement())
-  name      String
+  id          String   @id @default(cuid())
+  name        String
   description String
-  content   String
-  countryId Int
-  categoryId Int
-  image     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  content     String
+  countryId   String
+  categoryId  String
+  image       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  country   Country  @relation(fields: [countryId], references: [id])
-  category  Category @relation(fields: [categoryId], references: [id])
+  country     Country  @relation(fields: [countryId], references: [id])
+  category    Category @relation(fields: [categoryId], references: [id])
 
-  @@index([name])  // Índice para búsquedas de eventos por nombre
+  @@index([name])
 }
 
-model Estadistic {
-  id        Int     @id @default(autoincrement())
-  name      String
+model Statistic {
+  id          String   @id @default(cuid())
+  name        String
   description String
-  content   String
-  countryId Int
-  categoryId Int
-  image     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  content     String
+  countryId   String
+  categoryId  String
+  image       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  country     Country  @relation(fields: [countryId], references: [id])
+  category    Category @relation(fields: [categoryId], references: [id])
+
+  @@index([name])
+}
+
+model Elections {
+  id        String   @id @default(cuid())
+  countryId String
+  startDate DateTime
+  endDate   DateTime
 
   country   Country  @relation(fields: [countryId], references: [id])
-  category  Category @relation(fields: [categoryId], references: [id])
+  candidates PlayerElections[]
+  votes      Vote[] @relation("ElectionVotes")
 
-  @@index([name])  // Índice para búsquedas de estadísticas por nombre
+  @@index([countryId, startDate])
+}
+
+model PlayerElections {
+  id          String   @id @default(cuid())
+  electionId  String
+  playerId    String?
+  npcId       String?
+
+  election    Elections @relation(fields: [electionId], references: [id])
+  player      Player?   @relation(fields: [playerId], references: [id])
+  npc         Npc?      @relation(fields: [npcId], references: [id])
+  votes       Vote[]    @relation(name: "CandidateVotes")
+
+  @@unique([electionId, playerId, npcId])
+}
+
+model Vote {
+  id             String   @id @default(cuid())
+  electionId     String
+  voterPlayerId  String?
+  voterNpcId     String?
+  candidateId    String
+  voterPlayer    Player?  @relation(fields: [voterPlayerId], references: [id], name: "VoterPlayerVotes")
+  voterNpc       Npc?     @relation(fields: [voterNpcId], references: [id], name: "VoterNpcVotes")
+  candidate      PlayerElections @relation(fields: [candidateId], references: [id], name: "CandidateVotes")
+  election       Elections       @relation(fields: [electionId], references: [id], name: "ElectionVotes")
+  player         Player?         @relation(fields: [voterPlayerId], references: [id], name: "PlayerVotes")
+  npc            Npc?            @relation(fields: [voterNpcId], references: [id], name: "NpcVotes")
+
+  @@unique([electionId, voterPlayerId])
+  @@unique([electionId, voterNpcId])
 }

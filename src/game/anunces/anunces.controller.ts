@@ -11,7 +11,7 @@ export class AnuncesController {
     @Get()
     async getAll(
         @Query('count', ParseIntPipe) count?: number,
-        @Query('countryId', ParseIntPipe) countryId?: number
+        @Query('countryId', ParseIntPipe) countryId?: string
     ): Promise<{ anunces: GetAnunceDto[], total: number }> {
         try {
             const anunces = await this.anuncesService.getAll(count, countryId);
@@ -23,7 +23,7 @@ export class AnuncesController {
     }
 
     @Get(':id')
-    async getAnunce(@Param('id', ParseIntPipe) id: number): Promise<GetAnunceDto> {
+    async getAnunce(@Param('id', ParseIntPipe) id: string): Promise<GetAnunceDto> {
         try {
             const anunce = await this.anuncesService.getAnunce({ id });
             if (!anunce) throw new NotFoundException({ message: `Anunce con id ${id} no encontrado` });
@@ -46,7 +46,7 @@ export class AnuncesController {
     }
 
     @Delete(':id')
-    async deleteAnunce(@Param('id', ParseIntPipe) id: number): Promise<{ message: string }> {
+    async deleteAnunce(@Param('id', ParseIntPipe) id: string): Promise<{ message: string }> {
         try {
             await this.anuncesService.deleteAnunce(id);
             return { message: `Anunce ${id} eliminado correctamente` };
