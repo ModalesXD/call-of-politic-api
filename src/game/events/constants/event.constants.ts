@@ -1,0 +1,6 @@
+export const EVENT_CONSTANTS = {
+  DEFAULT_IMPACT: 0,
+  MAX_IMPACT: 100,
+  MIN_IMPACT: -100,
+  DEFAULT_IS_ACTIVE: true,
+} as const;

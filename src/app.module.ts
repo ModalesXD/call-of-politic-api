@@ -3,17 +3,24 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { GameModule } from './game/game.module';
-import { PlayerModule } from './game/player/player.module';
 import { DiscordModule } from './discord/discord.module';
 import { MapModule } from './map/map.module';
-import { EventsModule } from './game/events/events.module';
-import { AnuncesModule } from './game/anunces/anunces.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from './game/config/config.module';
+import { EntityModule } from './entity/entity.module';
 
 @Module({
-  imports: [PrismaModule, GameModule, PlayerModule, DiscordModule, MapModule, EventsModule, AnuncesModule, AuthModule, ConfigModule],
+  imports: [
+    PrismaModule,
+    GameModule,
+    DiscordModule,
+    MapModule,
+    AuthModule,
+    ConfigModule,
+    EntityModule
+  ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [AppService],
 })
 export class AppModule {}

@@ -13,7 +13,7 @@ export class AppService {
     return (this.prisma as any)[model];
   }
 
-  findAll<T>(model: keyof PrismaClient, args?: Prisma.NpcFindManyArgs): Promise<T[]> {
+  findAll<T>(model: keyof PrismaClient, args?: any): Promise<T[]> {
     return this.getModel(model).findMany(args);
   }
 

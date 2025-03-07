@@ -1,26 +1,44 @@
-import { IsString, IsNumber, IsUrl, IsArray } from "class-validator";
+import { IsString, IsNumber, IsUrl, IsOptional, IsDate, IsBoolean, IsArray } from "class-validator";
 
 
 export class CreateEventDto {
     
     @IsString()
-    name: string;
-
-    @IsString()
-    description: string;
+    title: string;
 
     @IsString()
     content: string;
 
-    @IsNumber()
+    @IsString()
     countryId: string;
 
-    @IsNumber()
+    @IsString()
     categoryId: string;
 
     @IsString()
+    @IsOptional()
+    description?: string;
+
+    @IsString()
     @IsUrl()
-    image: string;
+    @IsOptional()
+    imageUrl?: string;
+
+    @IsDate()
+    @IsOptional()
+    startDate?: Date;
+
+    @IsDate()
+    @IsOptional()
+    endDate?: Date;
+
+    @IsNumber()
+    @IsOptional()
+    impact?: number;
+
+    @IsBoolean()
+    @IsOptional()
+    isActive?: boolean;
 }
 
 export class GetEventDto {
@@ -30,27 +48,48 @@ export class GetEventDto {
 
 export class UpdateEventDto {
     @IsString()
-    name: string;
+    @IsOptional()
+    title?: string;
 
     @IsString()
-    description: string;
+    @IsOptional()
+    content?: string;
 
     @IsString()
-    content: string;
+    @IsOptional()
+    countryId?: string;
 
-    @IsNumber()
-    countryId: string;
+    @IsString()
+    @IsOptional()
+    categoryId?: string;
 
-    @IsNumber()
-    categoryId: string;
+    @IsString()
+    @IsOptional()
+    description?: string;
 
     @IsString()
     @IsUrl()
-    image: string;
+    @IsOptional()
+    imageUrl?: string;
+
+    @IsDate()
+    @IsOptional()
+    startDate?: Date;
+
+    @IsDate()
+    @IsOptional()
+    endDate?: Date;
+
+    @IsNumber()
+    @IsOptional()
+    impact?: number;
+
+    @IsBoolean()
+    @IsOptional()
+    isActive?: boolean;
 }
 
 export class DeleteEventDto {
     @IsNumber()
     id: string;
 }
-
