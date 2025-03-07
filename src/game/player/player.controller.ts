@@ -1,36 +1,37 @@
-import { Controller, Get, Post, Patch, Query, Delete, Param, Body } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { AppService } from 'src/app.service';
+import { Player } from '@prisma/client';
 import { PlayerDto } from './dto/player.dto';
-import { PlayerService } from './player.service';
 
 @Controller('player')
 export class PlayerController {
-    constructor(readonly playerService: PlayerService
-    ) { }
-    @Get()
-    async getPlayers(
-        @Query('count') count: number,
-        @Query('id') id: string,
-        @Query('rankId') rankId: PlayerDto['rankId'],
-        @Query('countryId') countryId: PlayerDto['countryId'],
-        @Query('ideologyId') ideologyId: PlayerDto['ideologyId'],
-    ) {
-        return this.playerService.getPlayers({ count, id, rankId, countryId, ideologyId });
-    }
+  constructor(private readonly database: AppService) {}
 
-    @Get(':id')
-    async getPlayerById(@Param('id') id: string) {
-        return this.playerService.getPlayerById(id);
-    }
+  @Get()
+  getAll(@Query('count') count?: number, @Query('id') id?: string) {
+    return this.database.findAll<Player>('player', {
+      where: id ? { id } : undefined,
+      take: count ?? 100
+    });
+  }
 
-    @Post()
-    async createPlayer(@Body() data: PlayerDto) {
-        return this.playerService.createPlayer(data);
-    }
+  @Get(':id')
+  getOne(@Param('id') id: string) {
+    return this.database.findOne<Player>('player', id);
+  }
 
-    @Patch(':id')
-    async updatePlayer(@Param('id') id: string, @Body() data: PlayerDto) {
-        return this.playerService.updatePlayer(id, data);
-    }
-    
+  @Post()
+  createPlayer(@Body() data: PlayerDto) {
+    return this.database.create<Player>('player', data);
+  }
 
+  @Put(':id')
+  updatePlayer(@Param('id') id: string, @Body() data: PlayerDto) {
+    return this.database.update<Player>('player', id, data);
+  }
+  
+  @Delete(':id')
+  deletePlayer(@Param('id') id: string) {
+    return this.database.delete<Player>('player', id);
+  }
 }

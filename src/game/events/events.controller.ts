@@ -1,54 +1,37 @@
-import { Controller, Get, Post, Delete, Patch, Query, Param, Body, ParseIntPipe, NotFoundException } from '@nestjs/common';
-import { EventsService } from './events.service';
-import { CreateEventDto, GetEventDto } from './dto/event.dto';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { AppService } from 'src/app.service';
+import { Event } from '@prisma/client';
+import { CreateEventDto, UpdateEventDto } from './dto/event.dto';
 
 @Controller('events')
 export class EventsController {
-    constructor(private readonly eventsService: EventsService) {}
+  constructor(private readonly database: AppService) {}
 
-    @Get()
-    async getEvents(
-        @Query('count', ParseIntPipe) count?: number,
-        @Query('categoryId', ParseIntPipe) categoryId?: string,
-        @Query('countryId', ParseIntPipe) countryId?: string
-    ): Promise<{ events: GetEventDto[], count: number }> {
-        const events = await this.eventsService.getEvents(count, categoryId, countryId);
-        return { events, count: events.length };
-    }
+  @Get()
+  getAll(@Query('count') count?: number, @Query('id') id?: string) {
+    return this.database.findAll<Event>('event', {
+      where: id ? { id } : undefined,
+      take: count ?? 100
+    });
+  }
 
-    @Get('random')
-    async getRandomEvent(
-        @Query('countryId', ParseIntPipe) countryId?: string,
-        @Query('categoryId', ParseIntPipe) categoryId?: string
-    ): Promise<GetEventDto> {
-        const event = await this.eventsService.getRandomEvent(countryId, categoryId);
-        if (!event) throw new NotFoundException('No events found.');
-        return event;
-    }
+  @Get(':id')
+  getOne(@Param('id') id: string) {
+    return this.database.findOne<Event>('event', id);
+  }
 
-    @Get(':id')
-    async getEventById(@Param('id', ParseIntPipe) id: string): Promise<GetEventDto> {
-        const event = await this.eventsService.getEventById(id);
-        if (!event) throw new NotFoundException(`Event with id ${id} not found.`);
-        return event;
-    }
+  @Post()
+  createEvent(@Body() data: CreateEventDto) {
+    return this.database.create<Event>('event', data);
+  }
 
-    @Post()
-    async createEvent(@Body() events: CreateEventDto[]): Promise<GetEventDto[]> {
-        return this.eventsService.createEvent(events);
-    }
-
-    @Delete(':id')
-    async deleteEvent(@Param('id', ParseIntPipe) id: string): Promise<{ message: string }> {
-        const deleted = await this.eventsService.deleteEvent(id);
-        if (!deleted) throw new NotFoundException(`Event with id ${id} not found.`);
-        return { message: `Event ${id} deleted successfully` };
-    }
-
-    @Patch(':id')
-    async updateEvent(@Param('id', ParseIntPipe) id: string, @Body() data: CreateEventDto): Promise<GetEventDto> {
-        const updatedEvent = await this.eventsService.updateEvent(id, data);
-        if (!updatedEvent) throw new NotFoundException(`Event with id ${id} not found.`);
-        return updatedEvent;
-    }
+  @Put(':id')
+  updateEvent(@Param('id') id: string, @Body() data: UpdateEventDto) {
+    return this.database.update<Event>('event', id, data);
+  }
+  
+  @Delete(':id')
+  deleteEvent(@Param('id') id: string) {
+    return this.database.delete<Event>('event', id);
+  }
 }

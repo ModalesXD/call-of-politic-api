@@ -1,57 +1,97 @@
 import { 
-    Controller, Get, Param, Body, Post, Delete, Query, ParseIntPipe, NotFoundException, BadRequestException, InternalServerErrorException 
+    Controller, Get, Param, Body, Post, Delete, Query, ParseIntPipe, NotFoundException, BadRequestException, InternalServerErrorException, Put 
 } from '@nestjs/common';
-import { CreateAnunceDto, GetAnunceDto } from './dto/anunce.dto';
-import { AnuncesService } from './anunces.service';
+import { CreateAnunceDto, GetAnunceDto, UpdateAnunceDto } from './dto/anunce.dto';
+import { AppService } from 'src/app.service';
+import { Anunce } from '@prisma/client';
 
 @Controller('anunces')
 export class AnuncesController {
-    constructor(private readonly anuncesService: AnuncesService) {}
+    constructor(private readonly database: AppService) {}
 
     @Get()
     async getAll(
         @Query('count', ParseIntPipe) count?: number,
-        @Query('countryId', ParseIntPipe) countryId?: string
+        @Query('countryId') countryId?: string,
+        @Query('categoryId') categoryId?: string
     ): Promise<{ anunces: GetAnunceDto[], total: number }> {
-        try {
-            const anunces = await this.anuncesService.getAll(count, countryId);
-            const total = await this.anuncesService.countAll(countryId); 
-            return { anunces, total };
-        } catch (error) {
-            throw new InternalServerErrorException({ message: 'Error al obtener los anuncios', error: error.message });
-        }
+        const where: any = {};
+        if (countryId) where.countryId = countryId;
+        if (categoryId) where.categoryId = categoryId;
+
+        const [anunces, total] = await Promise.all([
+            this.database.findAll<Anunce>('anunce', {
+                where,
+                take: count ?? 100,
+                orderBy: { createdAt: 'desc' }
+            }),
+            this.database.count<Anunce>('anunce', where)
+        ]);
+
+        return { anunces, total };
     }
 
     @Get(':id')
-    async getAnunce(@Param('id', ParseIntPipe) id: string): Promise<GetAnunceDto> {
-        try {
-            const anunce = await this.anuncesService.getAnunce({ id });
-            if (!anunce) throw new NotFoundException({ message: `Anunce con id ${id} no encontrado` });
-            return anunce;
-        } catch (error) {
-            throw new InternalServerErrorException({ message: 'Error al obtener el anuncio', error: error.message });
+    async getOne(@Param('id') id: string): Promise<GetAnunceDto> {
+        const anunce = await this.database.findOne<Anunce>('anunce', id);
+        if (!anunce) {
+            throw new NotFoundException(`Anuncio con ID ${id} no encontrado`);
         }
+        return anunce;
     }
 
-    @Post('create')
-    async createAnunce(@Body() createAnunceDtos: CreateAnunceDto[]): Promise<GetAnunceDto[]> {
-        try {
-            if (!Array.isArray(createAnunceDtos) || createAnunceDtos.length === 0) {
-                throw new BadRequestException({ message: 'El cuerpo de la solicitud debe contener un array de anuncios válidos' });
+    @Post()
+    async create(@Body() data: CreateAnunceDto | CreateAnunceDto[]): Promise<GetAnunceDto | GetAnunceDto[]> {
+        if (Array.isArray(data)) {
+            if (data.length === 0) {
+                throw new BadRequestException('El array de anuncios no puede estar vacío');
             }
-            return await this.anuncesService.createAnunce(createAnunceDtos);
+            return Promise.all(
+                data.map(anunce => this.database.create<Anunce>('anunce', anunce))
+            );
+        }
+        return this.database.create<Anunce>('anunce', data);
+    }
+
+    @Put(':id')
+    async update(@Param('id') id: string, @Body() data: UpdateAnunceDto): Promise<GetAnunceDto> {
+        try {
+            return await this.database.update<Anunce>('anunce', id, data);
         } catch (error) {
-            throw new InternalServerErrorException({ message: 'Error al crear anuncios', error: error.message });
+            throw new NotFoundException(`No se pudo actualizar el anuncio con ID ${id}`);
+        }
+    }
+    
+    @Delete(':id')
+    async delete(@Param('id') id: string): Promise<{ message: string }> {
+        try {
+            await this.database.delete<Anunce>('anunce', id);
+            return { message: `Anuncio ${id} eliminado correctamente` };
+        } catch (error) {
+            throw new NotFoundException(`No se pudo eliminar el anuncio con ID ${id}`);
         }
     }
 
-    @Delete(':id')
-    async deleteAnunce(@Param('id', ParseIntPipe) id: string): Promise<{ message: string }> {
-        try {
-            await this.anuncesService.deleteAnunce(id);
-            return { message: `Anunce ${id} eliminado correctamente` };
-        } catch (error) {
-            throw new InternalServerErrorException({ message: `Error al eliminar el anuncio con id ${id}`, error: error.message });
+    @Delete()
+    async deleteMany(@Body('ids') ids: string[]): Promise<{ message: string, results: { id: string, success: boolean }[] }> {
+        if (!Array.isArray(ids) || ids.length === 0) {
+            throw new BadRequestException('Se requiere un array de IDs para eliminar');
         }
+
+        const results = await Promise.all(
+            ids.map(async id => {
+                try {
+                    await this.database.delete<Anunce>('anunce', id);
+                    return { id, success: true };
+                } catch {
+                    return { id, success: false };
+                }
+            })
+        );
+
+        return {
+            message: 'Operación de eliminación múltiple completada',
+            results
+        };
     }
 }
