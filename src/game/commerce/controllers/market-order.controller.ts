@@ -23,14 +23,14 @@ export class MarketOrderController {
       ...(type && { type }),
       ...(status && { status }),
     };
-    return this.appService.findMany('marketOrder', { where });
+    return this.appService.findAll('marketOrder', { where });
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a market order by id' })
   @ApiResponse({ status: 200, description: 'Return a market order.' })
   async findOne(@Param('id') id: string) {
-    return this.appService.findOne('marketOrder', { id });
+    return this.appService.findOne('marketOrder', id );
   }
 
   @Post()
@@ -50,14 +50,14 @@ export class MarketOrderController {
     @Param('id') id: string,
     @Body() updateMarketOrderDto: UpdateMarketOrderDto,
   ) {
-    return this.appService.update('marketOrder', { id }, updateMarketOrderDto);
+    return this.appService.update('marketOrder', id , updateMarketOrderDto);
   }
 
   @Put(':id/cancel')
   @ApiOperation({ summary: 'Cancel a market order' })
   @ApiResponse({ status: 200, description: 'The market order has been cancelled.' })
   async cancelOrder(@Param('id') id: string) {
-    return this.appService.update('marketOrder', { id }, {
+    return this.appService.update('marketOrder', id, {
       status: MarketOrderStatus.CANCELLED,
     });
   }
@@ -66,6 +66,6 @@ export class MarketOrderController {
   @ApiOperation({ summary: 'Delete a market order' })
   @ApiResponse({ status: 200, description: 'The market order has been deleted.' })
   async remove(@Param('id') id: string) {
-    return this.appService.delete('marketOrder', { id });
+    return this.appService.delete('marketOrder', id );
   }
 }

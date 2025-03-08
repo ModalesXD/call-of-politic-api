@@ -27,18 +27,18 @@ enum ElectionStatus {
 }
 
 enum ResourceType {
-  NATURAL      // Petróleo, minerales, etc.
+  NATURAL // Petróleo, minerales, etc.
   MANUFACTURED // Productos procesados
   AGRICULTURAL // Productos agrícolas
-  TECHNOLOGY   // Productos tecnológicos
-  SERVICE      // Servicios
+  TECHNOLOGY // Productos tecnológicos
+  SERVICE // Servicios
 }
 
 enum ConfigType {
-  GAME        // Configuraciones globales del juego
-  PLAYER      // Configuraciones de jugador
-  ECONOMY     // Configuraciones económicas
-  POLITICS    // Configuraciones políticas
+  GAME // Configuraciones globales del juego
+  PLAYER // Configuraciones de jugador
+  ECONOMY // Configuraciones económicas
+  POLITICS // Configuraciones políticas
 }
 
 enum MarketOrderType {
@@ -47,11 +47,34 @@ enum MarketOrderType {
 }
 
 enum TaxType {
-  INCOME      // Impuesto sobre la renta
-  SALES       // IVA
-  PROPERTY    // Impuesto predial
-  IMPORT      // Aranceles
-  CORPORATE   // Impuesto corporativo
+  INCOME // Impuesto sobre la renta
+  SALES // IVA
+  PROPERTY // Impuesto predial
+  IMPORT // Aranceles
+  CORPORATE // Impuesto corporativo
+}
+
+enum WarStatus {
+  ONGOING
+  ENDED
+}
+
+enum WarRole {
+  ATTACKER
+  DEFENDER
+}
+
+enum WarType {
+  CONQUEST
+  DEFENSE
+  REVOLUTION
+  CIVIL
+}
+
+enum WarScope {
+  LOCAL
+  REGIONAL
+  GLOBAL
 }
 
 model BaseUser {
@@ -66,12 +89,12 @@ model BaseUser {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  country    Country   @relation(fields: [countryId], references: [id])
-  ideology   Ideology  @relation(fields: [ideologyId], references: [id])
-  rank       Rank      @relation(fields: [rankId], references: [id])
-  
-  player     Player?
-  npc        Npc?
+  country  Country  @relation(fields: [countryId], references: [id])
+  ideology Ideology @relation(fields: [ideologyId], references: [id])
+  rank     Rank     @relation(fields: [rankId], references: [id])
+
+  player Player?
+  npc    Npc?
 
   @@index([name])
   @@index([countryId])
@@ -79,53 +102,53 @@ model BaseUser {
 }
 
 model Player {
-  id            String   @id
-  baseUser      BaseUser @relation(fields: [id], references: [id])
-  discordId     String?  @unique
-  email         String?  @unique
-  lastLoginAt   DateTime?
-  experience    Int      @default(0)
-  level         Int      @default(1)
-  balance       Float    @default(0)  // Balance del jugador
-  
-  votes         Vote[]   @relation("PlayerVotes")
-  voterVotes    Vote[]   @relation("VoterPlayerVotes")
-  elections     PlayerElections[]
-  achievements  PlayerAchievement[]
-  configs       PlayerConfig[]
-  marketOrders  MarketOrder[]
-  buyerTrades   Trade[]  @relation("BuyerTrades")
-  sellerTrades  Trade[]  @relation("SellerTrades")
+  id          String    @id
+  baseUser    BaseUser  @relation(fields: [id], references: [id])
+  discordId   String?   @unique
+  email       String?   @unique
+  lastLoginAt DateTime?
+  experience  Int       @default(0)
+  level       Int       @default(1)
+  balance     Float     @default(0) // Balance del jugador
+
+  votes        Vote[]              @relation("PlayerVotes")
+  voterVotes   Vote[]              @relation("VoterPlayerVotes")
+  elections    PlayerElections[]
+  achievements PlayerAchievement[]
+  configs      PlayerConfig[]
+  marketOrders MarketOrder[]
+  buyerTrades  Trade[]             @relation("BuyerTrades")
+  sellerTrades Trade[]             @relation("SellerTrades")
 }
 
 model Npc {
-  id            String   @id
-  baseUser      BaseUser @relation(fields: [id], references: [id])
-  behavior      String?  // Patrón de comportamiento del NPC
-  difficulty    Int      @default(1)
-  isHostile     Boolean  @default(false)
-  
-  votes         Vote[]   @relation("NpcVotes")
-  voterVotes    Vote[]   @relation("VoterNpcVotes")
+  id         String   @id
+  baseUser   BaseUser @relation(fields: [id], references: [id])
+  behavior   String? // Patrón de comportamiento del NPC
+  difficulty Int      @default(1)
+  isHostile  Boolean  @default(false)
+
+  votes           Vote[]            @relation("NpcVotes")
+  voterVotes      Vote[]            @relation("VoterNpcVotes")
   playerElections PlayerElections[]
 }
 
 model Announcement {
-  id          String   @id @default(cuid())
-  title       String   @db.VarChar(255)
-  content     String   @db.Text
-  countryId   String
-  categoryId  String
-  imageUrl    String?
-  isActive    Boolean  @default(true)
-  priority    Int      @default(0)
-  startDate   DateTime?
-  endDate     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String    @id @default(cuid())
+  title      String    @db.VarChar(255)
+  content    String    @db.Text
+  countryId  String
+  categoryId String
+  imageUrl   String?
+  isActive   Boolean   @default(true)
+  priority   Int       @default(0)
+  startDate  DateTime?
+  endDate    DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
-  country     Country  @relation(fields: [countryId], references: [id])
-  category    Category @relation(fields: [categoryId], references: [id])
+  country  Country  @relation(fields: [countryId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
 
   @@index([title])
   @@index([countryId])
@@ -138,7 +161,7 @@ model Rank {
   name        String     @unique
   image       String?
   description String?    @db.Text
-  permission  String[]   // Array de permisos
+  permission  String[] // Array de permisos
   level       Int        @default(1)
   isActive    Boolean    @default(true)
   baseUsers   BaseUser[]
@@ -150,26 +173,28 @@ model Rank {
 }
 
 model Country {
-  id            String   @id @default(cuid())
-  name          String   @unique
-  code          String   @unique @db.VarChar(3)
-  image         String?
-  population    Int      @default(0)
-  gdp           Float    @default(0)
-  description   String?  @db.Text
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id          String   @id @default(cuid())
+  name        String   @unique
+  code        String   @unique @db.VarChar(3)
+  image       String?
+  population  Int      @default(0)
+  gdp         Float    @default(0)
+  description String?  @db.Text
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
 
-  baseUsers      BaseUser[]
-  announcements  Announcement[]
-  cities         City[]
-  states         State[]
-  events         Event[]
-  statistics     Statistic[]
-  elections      Elections[]
-  resources      CountryResource[]
-  economy        Economy?
+  baseUsers     BaseUser[]
+  announcements Announcement[]
+  cities        City[]
+  states        State[]
+  events        Event[]
+  statistics    Statistic[]
+  elections     Elections[]
+  resources     CountryResource[]
+  economy       Economy?
+  Alliances     Alliance[] 
+  warHistory  WarCountry[] // Historial de guerras en las que ha participado
 
   @@index([name])
   @@index([code])
@@ -177,17 +202,17 @@ model Country {
 }
 
 model Category {
-  id            String   @id @default(cuid())
-  name          String   @unique
-  description   String?  @db.Text
-  parentId      String?  // Para categorías jerárquicas
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?  @db.Text
+  parentId    String? // Para categorías jerárquicas
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  parent        Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
-  children      Category[] @relation("CategoryHierarchy")
-  
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+
   announcements Announcement[]
   events        Event[]
 
@@ -197,35 +222,35 @@ model Category {
 }
 
 model Ideology {
-  id          String     @id @default(cuid())
-  name        String     @unique
-  description String?    @db.Text
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?  @db.Text
   image       String?
   color       String?
-  isActive    Boolean    @default(true)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
 
-  baseUsers   BaseUser[]
+  baseUsers BaseUser[]
 
   @@index([name])
 }
 
 model Vote {
-  id          String    @id @default(cuid())
-  type        VoteType
-  comment     String?   @db.Text
-  createdAt   DateTime  @default(now())
+  id        String   @id @default(cuid())
+  type      VoteType
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
 
-  playerId    String?
-  npcId       String?
-  player      Player?   @relation("PlayerVotes", fields: [playerId], references: [id])
-  npc         Npc?      @relation("NpcVotes", fields: [npcId], references: [id])
+  playerId String?
+  npcId    String?
+  player   Player? @relation("PlayerVotes", fields: [playerId], references: [id])
+  npc      Npc?    @relation("NpcVotes", fields: [npcId], references: [id])
 
   voterPlayerId String?
   voterNpcId    String?
-  voterPlayer   Player?  @relation("VoterPlayerVotes", fields: [voterPlayerId], references: [id])
-  voterNpc      Npc?     @relation("VoterNpcVotes", fields: [voterNpcId], references: [id])
+  voterPlayer   Player? @relation("VoterPlayerVotes", fields: [voterPlayerId], references: [id])
+  voterNpc      Npc?    @relation("VoterNpcVotes", fields: [voterNpcId], references: [id])
 
   @@index([type])
   @@index([playerId])
@@ -243,10 +268,10 @@ model Elections {
   endDate     DateTime
   status      ElectionStatus @default(PENDING)
   createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  updatedAt   DateTime       @default(now())
 
-  country     Country            @relation(fields: [countryId], references: [id])
-  candidates  PlayerElections[]
+  country    Country           @relation(fields: [countryId], references: [id])
+  candidates PlayerElections[]
 
   @@index([countryId])
   @@index([status])
@@ -255,19 +280,19 @@ model Elections {
 }
 
 model PlayerElections {
-  id          String    @id @default(cuid())
-  electionId  String
-  playerId    String?
-  npcId       String?
-  votes       Int       @default(0)
-  position    String?   // Posición o cargo al que aspira
-  manifesto   String?   @db.Text
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id         String   @id @default(cuid())
+  electionId String
+  playerId   String?
+  npcId      String?
+  votes      Int      @default(0)
+  position   String? // Posición o cargo al que aspira
+  manifesto  String?  @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
 
-  election    Elections @relation(fields: [electionId], references: [id])
-  player      Player?   @relation(fields: [playerId], references: [id])
-  npc         Npc?      @relation(fields: [npcId], references: [id])
+  election Elections @relation(fields: [electionId], references: [id])
+  player   Player?   @relation(fields: [playerId], references: [id])
+  npc      Npc?      @relation(fields: [npcId], references: [id])
 
   @@index([electionId])
   @@index([playerId])
@@ -276,20 +301,20 @@ model PlayerElections {
 }
 
 model Event {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
-  description String?  @db.Text
+  description String?   @db.Text
   countryId   String
   categoryId  String
-  impact      Int      @default(0)
+  impact      Int       @default(0)
   startDate   DateTime
   endDate     DateTime?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
 
-  country     Country  @relation(fields: [countryId], references: [id])
-  category    Category @relation(fields: [categoryId], references: [id])
+  country  Country  @relation(fields: [countryId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
 
   @@index([countryId])
   @@index([categoryId])
@@ -298,17 +323,17 @@ model Event {
 }
 
 model City {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
   countryId   String
   stateId     String?
-  population  Int       @default(0)
-  coordinates Json?     // Coordenadas geográficas
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  population  Int      @default(0)
+  coordinates Json? // Coordenadas geográficas
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
 
-  country     Country   @relation(fields: [countryId], references: [id])
-  state       State?    @relation(fields: [stateId], references: [id])
+  country Country @relation(fields: [countryId], references: [id])
+  state   State?  @relation(fields: [stateId], references: [id])
 
   @@index([name])
   @@index([countryId])
@@ -316,28 +341,28 @@ model City {
 }
 
 model State {
-  id          String   @id @default(cuid())
-  name        String
-  countryId   String
-  population  Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  name       String
+  countryId  String
+  population Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
 
-  country     Country  @relation(fields: [countryId], references: [id])
-  cities      City[]
+  country Country @relation(fields: [countryId], references: [id])
+  cities  City[]
 
   @@index([name])
   @@index([countryId])
 }
 
 model Statistic {
-  id          String   @id @default(cuid())
-  countryId   String
-  type        String   // Tipo de estadística
-  value       Float
-  date        DateTime @default(now())
+  id        String   @id @default(cuid())
+  countryId String
+  type      String // Tipo de estadística
+  value     Float
+  date      DateTime @default(now())
 
-  country     Country  @relation(fields: [countryId], references: [id])
+  country Country @relation(fields: [countryId], references: [id])
 
   @@index([countryId])
   @@index([type])
@@ -351,7 +376,7 @@ model PlayerAchievement {
   description String?  @db.Text
   unlockedAt  DateTime @default(now())
 
-  player      Player   @relation(fields: [playerId], references: [id])
+  player Player @relation(fields: [playerId], references: [id])
 
   @@index([playerId])
   @@index([name])
@@ -360,12 +385,12 @@ model PlayerAchievement {
 model Config {
   id          String     @id @default(cuid())
   type        ConfigType
-  key         String     // Nombre de la configuración
-  value       String     // Valor en formato JSON
+  key         String // Nombre de la configuración
+  value       String // Valor en formato JSON
   description String?    @db.Text
   isActive    Boolean    @default(true)
   createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  updatedAt   DateTime   @default(now())
 
   @@unique([type, key])
   @@index([type])
@@ -373,14 +398,14 @@ model Config {
 }
 
 model PlayerConfig {
-  id          String   @id @default(cuid())
-  playerId    String
-  key         String   // Nombre de la configuración
-  value       String   // Valor en formato JSON
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  playerId  String
+  key       String // Nombre de la configuración
+  value     String // Valor en formato JSON
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
-  player      Player   @relation(fields: [playerId], references: [id])
+  player Player @relation(fields: [playerId], references: [id])
 
   @@unique([playerId, key])
 }
@@ -393,7 +418,7 @@ model Resource {
   basePrice   Float        @default(0)
   isActive    Boolean      @default(true)
   createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  updatedAt   DateTime     @default(now())
 
   countryResources CountryResource[]
   marketOrders     MarketOrder[]
@@ -404,69 +429,69 @@ model Resource {
 }
 
 model CountryResource {
-  id          String   @id @default(cuid())
-  countryId   String
-  resourceId  String
-  amount      Float    @default(0)
-  production  Float    @default(0)  // Producción por hora
-  capacity    Float    @default(0)  // Capacidad máxima de almacenamiento
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  countryId  String
+  resourceId String
+  amount     Float    @default(0)
+  production Float    @default(0) // Producción por hora
+  capacity   Float    @default(0) // Capacidad máxima de almacenamiento
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
 
-  country     Country  @relation(fields: [countryId], references: [id])
-  resource    Resource @relation(fields: [resourceId], references: [id])
+  country  Country  @relation(fields: [countryId], references: [id])
+  resource Resource @relation(fields: [resourceId], references: [id])
 
   @@unique([countryId, resourceId])
   @@index([countryId])
 }
 
 model Economy {
-  id              String   @id @default(cuid())
-  countryId       String   @unique
-  treasury        Float    @default(0)    // Fondos del gobierno
-  gdpGrowth       Float    @default(0)    // Crecimiento del PIB
-  inflation       Float    @default(0)    // Tasa de inflación
-  unemployment    Float    @default(0)    // Tasa de desempleo
-  debt            Float    @default(0)    // Deuda nacional
-  creditRating    String   @default("C")  // Calificación crediticia
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id           String   @id @default(cuid())
+  countryId    String   @unique
+  treasury     Float    @default(0) // Fondos del gobierno
+  gdpGrowth    Float    @default(0) // Crecimiento del PIB
+  inflation    Float    @default(0) // Tasa de inflación
+  unemployment Float    @default(0) // Tasa de desempleo
+  debt         Float    @default(0) // Deuda nacional
+  creditRating String   @default("C") // Calificación crediticia
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
 
-  country         Country  @relation(fields: [countryId], references: [id])
-  taxes           Tax[]
+  country Country @relation(fields: [countryId], references: [id])
+  taxes   Tax[]
 }
 
 model Tax {
   id          String   @id @default(cuid())
   economyId   String
   type        TaxType
-  rate        Float    @default(0)  // Tasa impositiva
+  rate        Float    @default(0) // Tasa impositiva
   description String?  @db.Text
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @default(now())
 
-  economy     Economy  @relation(fields: [economyId], references: [id])
+  economy Economy @relation(fields: [economyId], references: [id])
 
   @@unique([economyId, type])
 }
 
 model MarketOrder {
-  id          String         @id @default(cuid())
-  type        MarketOrderType
-  resourceId  String
-  playerId    String
-  amount      Float
-  price       Float
-  fulfilled   Float         @default(0)
-  status      String        @default("ACTIVE")  // ACTIVE, COMPLETED, CANCELLED
-  expiresAt   DateTime?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id         String          @id @default(cuid())
+  type       MarketOrderType
+  resourceId String
+  playerId   String
+  amount     Float
+  price      Float
+  fulfilled  Float           @default(0)
+  status     String          @default("ACTIVE") // ACTIVE, COMPLETED, CANCELLED
+  expiresAt  DateTime?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @default(now())
 
-  resource    Resource      @relation(fields: [resourceId], references: [id])
-  player      Player        @relation(fields: [playerId], references: [id])
-  trades      Trade[]
+  resource Resource @relation(fields: [resourceId], references: [id])
+  player   Player   @relation(fields: [playerId], references: [id])
+  trades   Trade[]
 
   @@index([type])
   @@index([status])
@@ -474,22 +499,22 @@ model MarketOrder {
 }
 
 model Trade {
-  id              String   @id @default(cuid())
-  marketOrderId   String
-  buyerId         String
-  sellerId        String
-  amount          Float
-  price           Float
-  totalPrice      Float
-  status          String   @default("PENDING")  // PENDING, COMPLETED, FAILED
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String   @id @default(cuid())
+  marketOrderId String
+  buyerId       String
+  sellerId      String
+  amount        Float
+  price         Float
+  totalPrice    Float
+  status        String   @default("PENDING") // PENDING, COMPLETED, FAILED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
 
-  marketOrder     MarketOrder @relation(fields: [marketOrderId], references: [id])
-  buyer           Player      @relation("BuyerTrades", fields: [buyerId], references: [id])
-  seller          Player      @relation("SellerTrades", fields: [sellerId], references: [id])
+  marketOrder MarketOrder @relation(fields: [marketOrderId], references: [id])
+  buyer       Player      @relation("BuyerTrades", fields: [buyerId], references: [id])
+  seller      Player      @relation("SellerTrades", fields: [sellerId], references: [id])
 
-  items           TradeItem[]
+  items TradeItem[]
 
   @@index([status])
   @@index([buyerId])
@@ -497,15 +522,64 @@ model Trade {
 }
 
 model TradeItem {
-  id          String   @id @default(cuid())
-  tradeId     String
-  resourceId  String
-  amount      Float
-  price       Float
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  tradeId    String
+  resourceId String
+  amount     Float
+  price      Float
+  createdAt  DateTime @default(now())
 
-  trade       Trade    @relation(fields: [tradeId], references: [id])
-  resource    Resource @relation(fields: [resourceId], references: [id])
+  trade    Trade    @relation(fields: [tradeId], references: [id])
+  resource Resource @relation(fields: [resourceId], references: [id])
 
   @@index([tradeId])
 }
+
+model War {
+  id          String        @id @default(cuid())
+  name        String
+  description String?       @db.Text
+  startDate   DateTime
+  endDate     DateTime?
+  status      WarStatus     @default(ONGOING)
+  type        WarType
+  scope       WarScope
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relación Many-to-Many con Country a través de WarCountry
+  participants WarCountry[]
+  alliances    Alliance[]
+
+  @@index([status])
+}
+
+
+model WarCountry {
+  id        String   @id @default(cuid())
+  warId     String
+  countryId String
+  role      WarRole  // Define si el país es atacante o defensor
+  createdAt DateTime @default(now())
+
+  war     War      @relation(fields: [warId], references: [id], onDelete: Cascade)
+  country Country  @relation(fields: [countryId], references: [id], onDelete: Cascade)
+
+  @@unique([warId, countryId]) // Asegura que un país no esté dos veces en la misma guerra
+}
+
+model Alliance {
+  id        String   @id @default(cuid())
+  warId     String
+  countryId String
+  playerId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  war       War      @relation(fields: [warId], references: [id], onDelete: Cascade)
+  country   Country  @relation(fields: [countryId], references: [id], onDelete: Cascade)
+
+  @@index([warId, countryId]) 
+  @@index([playerId])
+}
+

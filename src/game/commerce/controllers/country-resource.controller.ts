@@ -18,7 +18,7 @@ export class CountryResourceController {
       ...(countryId && { countryId }),
       ...(resourceId && { resourceId }),
     };
-    return this.appService.findMany('countryResource', {
+    return this.appService.findAll('countryResource', {
       where,
       include: { resource: true },
     });
@@ -28,9 +28,7 @@ export class CountryResourceController {
   @ApiOperation({ summary: 'Get a country resource by id' })
   @ApiResponse({ status: 200, description: 'Return a country resource.' })
   async findOne(@Param('id') id: string) {
-    return this.appService.findOne('countryResource', { id }, {
-      include: { resource: true },
-    });
+    return this.appService.findOne('countryResource', id );
   }
 
   @Post()
@@ -47,7 +45,7 @@ export class CountryResourceController {
   @ApiOperation({ summary: 'Update a country resource' })
   @ApiResponse({ status: 200, description: 'The country resource has been updated.' })
   async update(@Param('id') id: string, @Body() updateCountryResourceDto: any) {
-    return this.appService.update('countryResource', { id }, {
+    return this.appService.update('countryResource',  id , {
       ...updateCountryResourceDto,
       lastUpdate: new Date(),
     });
@@ -57,8 +55,8 @@ export class CountryResourceController {
   @ApiOperation({ summary: 'Produce resource' })
   @ApiResponse({ status: 200, description: 'Resource production has been processed.' })
   async produceResource(@Param('id') id: string, @Body('amount') amount: number) {
-    const resource = await this.appService.findOne('countryResource', { id });
-    return this.appService.update('countryResource', { id }, {
+    const resource: any = await this.appService.findOne('countryResource', id );
+    return this.appService.update('countryResource',  id , {
       amount: resource.amount + amount,
       lastUpdate: new Date(),
     });
@@ -68,11 +66,11 @@ export class CountryResourceController {
   @ApiOperation({ summary: 'Consume resource' })
   @ApiResponse({ status: 200, description: 'Resource consumption has been processed.' })
   async consumeResource(@Param('id') id: string, @Body('amount') amount: number) {
-    const resource = await this.appService.findOne('countryResource', { id });
+    const resource: any = await this.appService.findOne('countryResource', id );
     if (resource.amount < amount) {
       throw new Error('Insufficient resources');
     }
-    return this.appService.update('countryResource', { id }, {
+    return this.appService.update('countryResource',  id , {
       amount: resource.amount - amount,
       lastUpdate: new Date(),
     });
@@ -82,6 +80,6 @@ export class CountryResourceController {
   @ApiOperation({ summary: 'Delete a country resource' })
   @ApiResponse({ status: 200, description: 'The country resource has been deleted.' })
   async remove(@Param('id') id: string) {
-    return this.appService.delete('countryResource', { id });
+    return this.appService.delete('countryResource',  id );
   }
 }

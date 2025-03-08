@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { AppService } from 'src/app.service';
 import { Npc } from '@prisma/client';
-import { NpcDto } from './dto/npc.dto';
+import { NpcDto } from '../dto/npc.dto';
 
 @Controller('npc')
 export class NpcController {

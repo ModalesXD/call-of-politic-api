@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AppService } from '../../../app.service';
 import { CreateTradeDto, UpdateTradeDto, TradeStatus } from '../dto/trade.dto';
@@ -14,14 +23,14 @@ export class TradeController {
   async findAll(
     @Query('fromCountryId') fromCountryId?: string,
     @Query('toCountryId') toCountryId?: string,
-    @Query('status') status?: string,
+    @Query('status') status?: string
   ) {
     const where = {
       ...(fromCountryId && { fromCountryId }),
       ...(toCountryId && { toCountryId }),
       ...(status && { status }),
     };
-    return this.appService.findMany('trade', {
+    return this.appService.findAll('trade', {
       where,
       include: { items: true },
     });
@@ -31,7 +40,7 @@ export class TradeController {
   @ApiOperation({ summary: 'Get a trade by id' })
   @ApiResponse({ status: 200, description: 'Return a trade.' })
   async findOne(@Param('id') id: string) {
-    return this.appService.findOne('trade', { id }, { include: { items: true } });
+    return this.appService.findOne('trade', id);
   }
 
   @Post()
@@ -51,15 +60,18 @@ export class TradeController {
   @Put(':id')
   @ApiOperation({ summary: 'Update a trade' })
   @ApiResponse({ status: 200, description: 'The trade has been updated.' })
-  async update(@Param('id') id: string, @Body() updateTradeDto: UpdateTradeDto) {
-    return this.appService.update('trade', { id }, updateTradeDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateTradeDto: UpdateTradeDto
+  ) {
+    return this.appService.update('trade', id, updateTradeDto);
   }
 
   @Put(':id/accept')
   @ApiOperation({ summary: 'Accept a trade' })
   @ApiResponse({ status: 200, description: 'The trade has been accepted.' })
   async acceptTrade(@Param('id') id: string) {
-    return this.appService.update('trade', { id }, {
+    return this.appService.update('trade', id, {
       status: TradeStatus.ACCEPTED,
     });
   }
@@ -68,7 +80,7 @@ export class TradeController {
   @ApiOperation({ summary: 'Reject a trade' })
   @ApiResponse({ status: 200, description: 'The trade has been rejected.' })
   async rejectTrade(@Param('id') id: string) {
-    return this.appService.update('trade', { id }, {
+    return this.appService.update('trade', id, {
       status: TradeStatus.REJECTED,
     });
   }
@@ -77,6 +89,6 @@ export class TradeController {
   @ApiOperation({ summary: 'Delete a trade' })
   @ApiResponse({ status: 200, description: 'The trade has been deleted.' })
   async remove(@Param('id') id: string) {
-    return this.appService.delete('trade', { id });
+    return this.appService.delete('trade', id);
   }
 }

@@ -1,48 +1,49 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { VoteService } from '../services/vote.service';
+import { AppService } from '../../../app.service';
+import { Vote } from '@prisma/client';
 import { CreateVoteDto } from '../dto/vote.dto';
 
-@ApiTags('Votes')
 @Controller('votes')
 export class VoteController {
-  constructor(private readonly voteService: VoteService) {}
+  constructor(private readonly database: AppService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all votes' })
-  @ApiResponse({ status: 200, description: 'Return all votes.' })
-  async findAll(
-    @Query('electionId') electionId?: string,
-    @Query('voterId') voterId?: string,
-  ) {
-    return this.voteService.findAll(electionId, voterId);
+  async getAll(
+    @Query() id: string
+) {
+    return this.database.findAll<Vote>('vote', {
+      where: {
+        id: id ?? { id },
+      },
+    });
   }
-
   @Get(':id')
-  @ApiOperation({ summary: 'Get a vote by id' })
-  @ApiResponse({ status: 200, description: 'Return a vote.' })
-  async findOne(@Param('id') id: string) {
-    return this.voteService.findOne(id);
+  async getOne(@Param('id') id: string) {
+    return this.database.findOne<Vote>('vote', id);
   }
 
   @Post()
-  @ApiOperation({ summary: 'Cast a vote' })
-  @ApiResponse({ status: 201, description: 'The vote has been cast.' })
-  async create(@Body() createVoteDto: CreateVoteDto) {
-    return this.voteService.create(createVoteDto);
+  async create(@Body() data: any) {
+    return this.database.create<Vote>('vote', data);
   }
 
-  @Get('election/:electionId/results')
-  @ApiOperation({ summary: 'Get election results' })
-  @ApiResponse({ status: 200, description: 'Return election results.' })
-  async getElectionResults(@Param('electionId') electionId: string) {
-    return this.voteService.getElectionResults(electionId);
+  @Put(':id')
+  async update(@Param('id') id: string, @Body() data: any) {
+    return this.database.update<Vote>('vote', id, data);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a vote' })
-  @ApiResponse({ status: 200, description: 'The vote has been deleted.' })
-  async remove(@Param('id') id: string) {
-    return this.voteService.remove(id);
+  async delete(@Param('id') id: string) {
+    return this.database.delete<Vote>('vote', id);
   }
 }
