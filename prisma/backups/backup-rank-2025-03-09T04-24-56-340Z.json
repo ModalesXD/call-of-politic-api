@@ -1,0 +1,17 @@
+[
+  {
+    "id": "cm80ynol70002rf8aixan0tzi",
+    "name": "Presidente",
+    "image": null,
+    "description": "El máximo rango de autoridad en el país.",
+    "permission": [
+      "read",
+      "write",
+      "execute"
+    ],
+    "level": 10,
+    "isActive": true,
+    "createdAt": "2025-03-09T01:34:40.699Z",
+    "updatedAt": "2025-03-09T01:34:40.699Z"
+  }
+]

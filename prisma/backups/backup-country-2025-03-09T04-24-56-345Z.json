@@ -1,0 +1,26 @@
+[
+  {
+    "id": "cm80ynoh90000rf8assopq1i9",
+    "name": "Guatemala",
+    "code": "GT",
+    "image": null,
+    "population": 2813941,
+    "gdp": 791868.4678589115,
+    "description": "Demonstro condico canis vomica demulceo temeritas vox cruciamentum denego tricesimus.",
+    "isActive": true,
+    "createdAt": "2025-03-09T01:34:40.558Z",
+    "updatedAt": "2025-03-09T01:34:40.558Z"
+  },
+  {
+    "id": "cm80ynoju0001rf8a6ls9z4bu",
+    "name": "Honduras",
+    "code": "HN",
+    "image": null,
+    "population": 5777789,
+    "gdp": 168549.1851645777,
+    "description": "Voveo absconditus vallum aveho aegrotatio exercitationem spoliatio quos venia thymum.",
+    "isActive": true,
+    "createdAt": "2025-03-09T01:34:40.651Z",
+    "updatedAt": "2025-03-09T01:34:40.651Z"
+  }
+]

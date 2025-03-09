@@ -1,0 +1,22 @@
+[
+  {
+    "id": "cm80ynoms0003rf8aa5kb59e4",
+    "name": "Liberalismo",
+    "description": "Una ideología política que promueve la libertad individual.",
+    "image": null,
+    "color": "#354847",
+    "isActive": true,
+    "createdAt": "2025-03-09T01:34:40.756Z",
+    "updatedAt": "2025-03-09T01:34:40.756Z"
+  },
+  {
+    "id": "cm80ynooq0004rf8a1jabvgb3",
+    "name": "Socialismo",
+    "description": "Una ideología política que promueve la igualdad social.",
+    "image": null,
+    "color": "#52456e",
+    "isActive": true,
+    "createdAt": "2025-03-09T01:34:40.827Z",
+    "updatedAt": "2025-03-09T01:34:40.827Z"
+  }
+]

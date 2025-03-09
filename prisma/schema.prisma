@@ -99,6 +99,7 @@ model BaseUser {
   @@index([name])
   @@index([countryId])
   @@index([type])
+  @@map("base_users")
 }
 
 model Player {
@@ -119,6 +120,8 @@ model Player {
   marketOrders MarketOrder[]
   buyerTrades  Trade[]             @relation("BuyerTrades")
   sellerTrades Trade[]             @relation("SellerTrades")
+
+  @@map("players")
 }
 
 model Npc {
@@ -131,6 +134,8 @@ model Npc {
   votes           Vote[]            @relation("NpcVotes")
   voterVotes      Vote[]            @relation("VoterNpcVotes")
   playerElections PlayerElections[]
+
+  @@map("npcs")
 }
 
 model Announcement {
@@ -154,6 +159,7 @@ model Announcement {
   @@index([countryId])
   @@index([categoryId])
   @@index([isActive])
+  @@map("announcements")
 }
 
 model Rank {
@@ -170,6 +176,7 @@ model Rank {
 
   @@index([name])
   @@index([level])
+  @@map("ranks")
 }
 
 model Country {
@@ -193,12 +200,14 @@ model Country {
   elections     Elections[]
   resources     CountryResource[]
   economy       Economy?
-  Alliances     Alliance[] 
-  warHistory  WarCountry[] // Historial de guerras en las que ha participado
+  alliances     Alliance[] 
+  warHistory    WarCountry[] // Historial de guerras en las que ha participado
+  territories   Territory[]  // Territorios dentro del país
 
   @@index([name])
   @@index([code])
   @@index([isActive])
+  @@map("countries")
 }
 
 model Category {
@@ -208,7 +217,7 @@ model Category {
   parentId    String? // Para categorías jerárquicas
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @default(now())
 
   parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children Category[] @relation("CategoryHierarchy")
@@ -219,6 +228,7 @@ model Category {
   @@index([name])
   @@index([parentId])
   @@index([isActive])
+  @@map("categories")
 }
 
 model Ideology {
@@ -234,6 +244,7 @@ model Ideology {
   baseUsers BaseUser[]
 
   @@index([name])
+  @@map("ideologies")
 }
 
 model Vote {
@@ -257,6 +268,7 @@ model Vote {
   @@index([npcId])
   @@index([voterPlayerId])
   @@index([voterNpcId])
+  @@map("votes")
 }
 
 model Elections {
@@ -277,6 +289,7 @@ model Elections {
   @@index([status])
   @@index([startDate])
   @@index([endDate])
+  @@map("elections")
 }
 
 model PlayerElections {
@@ -298,6 +311,7 @@ model PlayerElections {
   @@index([playerId])
   @@index([npcId])
   @@index([votes])
+  @@map("player_elections")
 }
 
 model Event {
@@ -320,6 +334,7 @@ model Event {
   @@index([categoryId])
   @@index([isActive])
   @@index([startDate])
+  @@map("events")
 }
 
 model City {
@@ -328,22 +343,43 @@ model City {
   countryId   String
   stateId     String?
   population  Int      @default(0)
-  coordinates Json? // Coordenadas geográficas
+  coordinates Json?    // Coordenadas geográficas (latitud, longitud)
+  territoryId String?
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now())
-
-  country Country @relation(fields: [countryId], references: [id])
-  state   State?  @relation(fields: [stateId], references: [id])
+  updatedAt   DateTime @updatedAt
+  country     Country    @relation(fields: [countryId], references: [id])
+  state       State?     @relation(fields: [stateId], references: [id])
+  territory   Territory? @relation(fields: [territoryId], references: [id])
 
   @@index([name])
   @@index([countryId])
   @@index([stateId])
+  @@map("cities")
 }
+
+model Territory {
+  id          String   @id @default(cuid())
+  name        String
+  countryId   String
+  coordinates Json?    // Coordenadas geográficas (puede ser una lista de puntos o área)
+  area        Float?   // El área del territorio, si se necesita
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  country     Country  @relation(fields: [countryId], references: [id])
+  cities      City[]   // Ciudades dentro del territorio (si es aplicable)
+
+  @@index([name])
+  @@index([countryId])
+  @@map("territories")
+}
+
 
 model State {
   id         String   @id @default(cuid())
   name       String
   countryId  String
+  coordinates Json?
   population Int      @default(0)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now())
@@ -353,6 +389,7 @@ model State {
 
   @@index([name])
   @@index([countryId])
+  @@map("states")
 }
 
 model Statistic {
@@ -367,6 +404,7 @@ model Statistic {
   @@index([countryId])
   @@index([type])
   @@index([date])
+  @@map("statistics")
 }
 
 model PlayerAchievement {
@@ -380,21 +418,23 @@ model PlayerAchievement {
 
   @@index([playerId])
   @@index([name])
+  @@map("player_achievements")
 }
 
 model Config {
   id          String     @id @default(cuid())
   type        ConfigType
-  key         String // Nombre de la configuración
-  value       String // Valor en formato JSON
+  key         String     // Nombre de la configuración
+  value       String     // Valor en formato JSON
   description String?    @db.Text
   isActive    Boolean    @default(true)
   createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
-  @@unique([type, key])
+  @@unique([type, key])  // Ensures unique configuration per type and key
   @@index([type])
-  @@index([isActive])
+  @@index([key])
+  @@map("configs")
 }
 
 model PlayerConfig {
@@ -408,6 +448,7 @@ model PlayerConfig {
   player Player @relation(fields: [playerId], references: [id])
 
   @@unique([playerId, key])
+  @@map("player_configs")
 }
 
 model Resource {
@@ -426,6 +467,7 @@ model Resource {
 
   @@index([type])
   @@index([isActive])
+  @@map("resources")
 }
 
 model CountryResource {
@@ -443,6 +485,7 @@ model CountryResource {
 
   @@unique([countryId, resourceId])
   @@index([countryId])
+  @@map("country_resources")
 }
 
 model Economy {
@@ -459,6 +502,21 @@ model Economy {
 
   country Country @relation(fields: [countryId], references: [id])
   taxes   Tax[]
+  logs    EconomyLog[]
+
+  @@map("economies")
+}
+
+model EconomyLog {
+  id        String   @id @default(cuid())
+  economyId String
+  message   String
+  createdAt DateTime @default(now())
+
+  economy Economy @relation(fields: [economyId], references: [id])
+
+  @@index([economyId])
+  @@map("economy_logs")
 }
 
 model Tax {
@@ -474,6 +532,7 @@ model Tax {
   economy Economy @relation(fields: [economyId], references: [id])
 
   @@unique([economyId, type])
+  @@map("taxes")
 }
 
 model MarketOrder {
@@ -496,6 +555,7 @@ model MarketOrder {
   @@index([type])
   @@index([status])
   @@index([playerId])
+  @@map("market_orders")
 }
 
 model Trade {
@@ -514,11 +574,14 @@ model Trade {
   buyer       Player      @relation("BuyerTrades", fields: [buyerId], references: [id])
   seller      Player      @relation("SellerTrades", fields: [sellerId], references: [id])
 
-  items TradeItem[]
+  items       TradeItem[]
+  logs        TradeLog[]
+  history     TradeHistory[]
 
   @@index([status])
   @@index([buyerId])
   @@index([sellerId])
+  @@map("trades")
 }
 
 model TradeItem {
@@ -533,6 +596,31 @@ model TradeItem {
   resource Resource @relation(fields: [resourceId], references: [id])
 
   @@index([tradeId])
+  @@map("trade_items")
+}
+
+model TradeLog {
+  id        String   @id @default(cuid())
+  tradeId   String
+  message   String
+  createdAt DateTime @default(now())
+
+  trade Trade @relation(fields: [tradeId], references: [id])
+
+  @@index([tradeId])
+  @@map("trade_logs")
+}
+
+model TradeHistory {
+  id        String   @id @default(cuid())
+  tradeId   String
+  status    String
+  createdAt DateTime @default(now())
+
+  trade Trade @relation(fields: [tradeId], references: [id])
+
+  @@index([tradeId])
+  @@map("trade_histories")
 }
 
 model War {
@@ -554,7 +642,6 @@ model War {
   @@index([status])
 }
 
-
 model WarCountry {
   id        String   @id @default(cuid())
   warId     String
@@ -574,7 +661,7 @@ model Alliance {
   countryId String
   playerId  String?
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now())
 
   war       War      @relation(fields: [warId], references: [id], onDelete: Cascade)
   country   Country  @relation(fields: [countryId], references: [id], onDelete: Cascade)
@@ -583,3 +670,13 @@ model Alliance {
   @@index([playerId])
 }
 
+model Season {
+  id        String @id @default(cuid())
+  season    Int @default(autoincrement())
+  description String?
+  data      String
+  isActive Boolean
+  createdAt DateTime @default(now())
+  updated   DateTime @default(now())
+  endDate   DateTime?
+}

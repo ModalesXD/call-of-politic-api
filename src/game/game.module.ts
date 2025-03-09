@@ -9,6 +9,8 @@ import { EntityModule } from './entity/entity.module';
 import { EventsModule } from './events/events.module';
 import { LocationModule } from './location/location.module';
 import { GameService } from './game.service';
+import { GameController } from './game.controller';
+
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { GameService } from './game.service';
     PoliticsModule,
     LocationModule
   ],
+  controllers: [GameController],
   providers: [AppService, GameService]
 })
 export class GameModule {}

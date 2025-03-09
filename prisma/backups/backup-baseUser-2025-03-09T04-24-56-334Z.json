@@ -1,0 +1,26 @@
+[
+  {
+    "id": "cm80ynoqe0006rf8a2y1an320",
+    "name": "ModalesXD",
+    "image": "https://avatars.githubusercontent.com/u/52432632",
+    "countryId": "cm80ynoh90000rf8assopq1i9",
+    "ideologyId": "cm80ynoms0003rf8aa5kb59e4",
+    "rankId": "cm80ynol70002rf8aixan0tzi",
+    "type": "ADMIN",
+    "isActive": true,
+    "createdAt": "2025-03-09T01:34:40.886Z",
+    "updatedAt": "2025-03-09T01:34:40.886Z"
+  },
+  {
+    "id": "cm80ynord0008rf8aauzetf81",
+    "name": "Screed",
+    "image": "https://avatars.githubusercontent.com/u/5767500",
+    "countryId": "cm80ynoju0001rf8a6ls9z4bu",
+    "ideologyId": "cm80ynooq0004rf8a1jabvgb3",
+    "rankId": "cm80ynol70002rf8aixan0tzi",
+    "type": "ADMIN",
+    "isActive": true,
+    "createdAt": "2025-03-09T01:34:40.921Z",
+    "updatedAt": "2025-03-09T01:34:40.921Z"
+  }
+]

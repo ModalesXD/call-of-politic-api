@@ -3,7 +3,7 @@ import { AppService } from '../../../app.service';
 import { BaseUser } from '@prisma/client';
 import { CreateBaseUserDto, GetBaseUserDto, UpdateBaseUserDto } from '../dto/base-user.dto';
 
-@Controller('base-user')
+@Controller('baseUser')
 export class BaseUserController {
   constructor(private readonly database: AppService) {}
 

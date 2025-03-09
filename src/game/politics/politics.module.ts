@@ -4,7 +4,7 @@ import { VoteController } from './controllers/vote.controller';
 import { PlayerController } from '../entity/controllers/player.controller';
 import { IdeologyController } from './controllers/ideology.controller';
 import { ElectionsController } from './controllers/elections.controller';
-import { GameService } from '../game.service';
+
 import { AppService } from 'src/app.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 
@@ -17,6 +17,6 @@ import { PrismaModule } from 'src/prisma/prisma.module';
     IdeologyController,
     ElectionsController,
   ],
-  providers: [GameService, AppService]
+  providers: [AppService]
 })
 export class PoliticsModule {}
