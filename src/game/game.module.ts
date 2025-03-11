@@ -10,6 +10,7 @@ import { EventsModule } from './events/events.module';
 import { LocationModule } from './location/location.module';
 import { GameService } from './game.service';
 import { GameController } from './game.controller';
+import { SeasonService } from './season.service';
 
 
 @Module({
@@ -23,6 +24,6 @@ import { GameController } from './game.controller';
     LocationModule
   ],
   controllers: [GameController],
-  providers: [AppService, GameService]
+  providers: [AppService, GameService, SeasonService]
 })
 export class GameModule {}
